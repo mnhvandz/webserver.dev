@@ -16,4 +16,7 @@ Vagrant.configure(2) do |config|
     # Customize the amount of memory on the VM:
     vb.memory = "1024"
   end
+
+  # Shell commands to execute within the guest virtual machine
+  config.vm.provision :shell, path: "shell_provisioning/shell_provisioning.sh"
 end
