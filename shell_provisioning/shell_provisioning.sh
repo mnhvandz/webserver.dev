@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-
-
 # update and upgrade on the guest virtual machine
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -18,9 +16,30 @@ sudo a2enmod vhost_alias
 # enable vhost_alias
 sudo a2enmod status
 
-
 # TODO setup hosts file
 
+# Create symbolic link to the projects folder
+ln -fs /vagrant/projects /var/www
+
+ProjectName='webapp'
+WebRootFolder='web'
+
+# setup hosts file to 
+VHOST=$(cat <<EOF
+ServerName webserver.dev
+<VirtualHost *:80>
+    DocumentRoot "/var/www/${ProjectName}/${WebRootFolder}"
+    <Directory "/var/www/${ProjectName}/${WebRootFolder}">
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+EOF
+)
+echo "${VHOST}" > /etc/apache2/sites-available/"${ProjectName}".conf 
+sudo a2dissite 000-default.conf 2> /dev/null
+sudo a2ensite "${ProjectName}".conf 2> /dev/null
+sudo service apache2 reload 2> /dev/null
 
 #Install php5 & related modules
 sudo apt-get install php5 php5-cli php5-common libapache2-mod-php5 -y
